@@ -29,8 +29,15 @@ namespace brsbrd
       : m_value(arg)
       {}
 
+      inline const Value& value() const
+      {
+        return m_value;
+      }
+
+      Json& addToArray(Value value);
       Json& operator[](const std::string& key);
-      std::string toString() const;
+
+      std::string serialize() const;
       
     private:
       Value m_value{std::monostate{}};
