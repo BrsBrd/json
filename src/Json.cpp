@@ -19,7 +19,7 @@ namespace brsbrd
     return *this;
   }
 
-  Json &Json::operator[](const std::string& key)
+  Json &Json::operator[](const String& key)
   {
     if(!std::holds_alternative<Object>(m_value))
     {
@@ -32,9 +32,9 @@ namespace brsbrd
   {
     std::string ret{};
     std::visit(overloaded{
-      [&](std::string str){ ret = fmt::format("{:?}", str); },
-      [&](float f){ ret = fmt::format("{}", f); },
-      [&](bool b){ ret = fmt::format("{}", b); },
+      [&](String str){ ret = fmt::format("{:?}", str); },
+      [&](Number f){ ret = fmt::format("{}", f); },
+      [&](Bool b){ ret = fmt::format("{}", b); },
       [&](Array array)
       {
         ret = fmt::format("[{}]", fmt::join(std::views::transform(array, [](auto& v){return v.serialize();}), ","));
@@ -47,7 +47,7 @@ namespace brsbrd
                                                                       return fmt::format("{:?}:{}", pair.first, pair.second.serialize());
                                                                     }), ","));
       },
-      [&](std::monostate){ ret = "null"; },
+      [&](Null){ ret = "null"; },
     }, m_value);
     return ret; 
   }

@@ -13,10 +13,14 @@ namespace brsbrd
   class Json
   {
     public:
+      using Null = std::monostate;
+      using String = std::string;
+      using Number = float;
+      using Bool = bool;
       using Array = std::vector<Json>;
-      using Object = std::map<std::string, Json>;
-      using Value = std::variant<std::monostate, std::string, float, Object, Array, bool>;
-      static constexpr std::monostate null{};
+      using Object = std::map<String, Json>;
+      using Value = std::variant<Null, String, Number, Object, Array, Bool>;
+      static constexpr Null null{};
 
       Json() = default;     
       
@@ -29,18 +33,30 @@ namespace brsbrd
       : m_value(arg)
       {}
 
+      // support non float numbers
+      template<typename T>
+      requires requires (T arg)
+      {
+        requires std::is_integral_v<T> || std::is_floating_point_v<T>;
+        requires !std::is_same_v<Bool, T>;
+        requires !std::is_same_v<Number, T>;
+      }
+      Json(T arg)
+      : m_value(static_cast<Number>(arg))
+      {}
+
       inline const Value& value() const
       {
         return m_value;
       }
 
       Json& addToArray(Value value);
-      Json& operator[](const std::string& key);
+      Json& operator[](const String& key);
 
       std::string serialize() const;
       
     private:
-      Value m_value{std::monostate{}};
+      Value m_value{null};
   };
 }
 
